@@ -1,0 +1,10 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.babybus.plugin.hotfix" >
+    <application android:allowBackup="true"
+        android:label="@string/app_name"
+        android:supportsRtl="true">
+        <meta-data
+            android:name="plugin_hotfix"
+            android:value="HotFix" />
+    </application>
+</manifest>

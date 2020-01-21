@@ -1,0 +1,102 @@
+apply plugin: 'com.github.dcendents.android-maven'
+//apply plugin: 'com.jfrog.bintray'
+group = GROUP
+version = VERSION_NAME
+
+
+def getPropertyFromLocalProperties(key) {
+    File file = project.rootProject.file('local.properties');
+    if (file.exists()) {
+        Properties properties = new Properties()
+        properties.load(file.newDataInputStream());
+        return properties.getProperty(key)
+    }
+}
+
+def getRepositoryUrl() {
+    return isSnapshot() ? getPropertyFromLocalProperties("SNAPSHOT_REPOSITORY_URL") : getPropertyFromLocalProperties("RELEASE_REPOSITORY_URL")
+//    return isSnapshot() ? SNAPSHOT_REPOSITORY_URL : RELEASE_REPOSITORY_URL
+}
+
+def isSnapshot() {
+    return version.endsWith("SNAPSHOT");
+}
+
+def hasAndroidPlugin() {
+    return getPlugins().inject(false) { a, b->
+        def classStr = b.getClass().name
+        def isAndroid = ("com.android.build.gradle.LibraryPlugin" == classStr) || ("com.android.build.gradle.AppPlugin" == classStr)
+        a || isAndroid
+    }
+}
+task sourcesJar(type: Jar) {
+    if (hasAndroidPlugin()) {
+        from android.sourceSets.main.java.srcDirs
+        classifier = 'sources'
+    } else {
+        from sourceSets.main.allSource
+        classifier = 'sources'
+    }
+}
+artifacts {
+    archives sourcesJar
+}
+
+uploadArchives {
+//    repositories.mavenDeployer {
+//        repository(url: repositoryUrl) {
+//            authentication(userName: getPropertyFromLocalProperties("USER"), password: getPropertyFromLocalProperties("PASSWORD"))
+//        }
+//    }
+
+//    repositories {
+//        mavenDeployer {
+//            //设置插件的GAV参数
+//            pom.groupId = 'com.meituan.robust'
+//            //pom.artifactId = 'cooker-plugin'
+//            pom.version = 1.0
+//            //文件发布到下面目录
+//            repository(url: uri('/Users/onetwothrfee/Desktop/热修复测试/release/gradleplugin'))
+//        }
+//    }
+    repositories {
+        mavenDeployer {
+            //这里的url是nexus中maven-releases的路径，可以点击copy按钮查看复制
+            repository(url: "http://nexus.baby-bus.com/repository/robust/") {
+                // nexus账号的用户名和密码，我这里没用默认的admin
+                authentication(userName: "admin", password: "admin123")
+            }
+
+            // 下面这三项pom参数，在调用的时候是这个样子 ： compile 'com.jcking.jbottomtabbar:jbottomtabbar:0.0.1'
+            // library的包名
+            pom.groupId = 'com.babybus.robust'
+            // library的项目名
+            pom.artifactId = "${project.name}"
+            // library的版本号
+            pom.version = '1.4.1'
+
+            pom.project {
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+            }
+        }
+    }
+}
+//bintray {
+//    user = getPropertyFromLocalProperties("bintray.user")
+//    key = getPropertyFromLocalProperties("bintray.apikey")
+//    configurations = ['archives']
+//    pkg {
+//        repo = 'maven'
+//        name = "${project.group}:${project.name}"
+//        userOrg = 'meituan'
+//        licenses = ['Apache-2.0']
+//        websiteUrl = 'http://tech.meituan.com/android_autopatch.html'
+//        vcsUrl = 'https://github.com/Meituan-Dianping/Robust'
+//        publish = true
+//    }
+//}
