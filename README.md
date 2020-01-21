@@ -1,4 +1,4 @@
-
+美团原Robest只对产品少的支持效果好，故对其进行修改，使其适用多产品多渠道打包需求
 # Robust
  
 [![Download](https://api.bintray.com/packages/meituan/maven/com.meituan.robust%3Apatch/images/download.svg?version=0.4.82) ](https://bintray.com/meituan/maven/com.meituan.robust%3Apatch/0.4.82/link)
